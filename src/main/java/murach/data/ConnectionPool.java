@@ -14,26 +14,11 @@ public class ConnectionPool {
     private String dbUrl, userName, pw;
 
     private ConnectionPool() {
-this.dbUrl=                "jdbc:mysql://localhost:3306/murach";
-this.userName=                "root";
-this.pw=                "BeNice";
-        try {
-            this.c = DriverManager.getConnection(dbUrl, userName, pw);
-        } catch (SQLException e) {
-            c=null;
-            e.printStackTrace();
-        }
+        this.dbUrl = "jdbc:mysql://localhost:3306/murach";
+        this.userName = "root";
+        this.pw = "BeNice";
+        this.c = getConnection();
     }
-/*
-    private ConnectionPool() {
-        try {
-            InitialContext ic = new InitialContext();
-            dataSource = (DataSource) ic.lookup("java:/comp/env/jdbc/murach");
-        } catch (NamingException e) {
-            System.out.println(e);
-        }
-    }
- */
 
     public static synchronized ConnectionPool getInstance() {
         if (pool == null) {
@@ -43,12 +28,19 @@ this.pw=                "BeNice";
     }
 
     public Connection getConnection() {
-        //TODO: When connection goes bad -- how to reopen?
-            System.out.println("returning c="+c);
-            return c;
+        try {
+            if (c == null || !c.isValid(10)) {
+                System.out.format("Getting connection:%s\n%s\n%s\n",dbUrl,userName,pw);
+                c = DriverManager.getConnection(dbUrl, userName, pw);
+            }
+        } catch (SQLException e) {
+            c = null;
+            e.printStackTrace();
+        }
+        return c;
     }
 
     public void freeConnection(Connection c) {
-        System.out.println("refusing to close c="+c);
+        System.out.println("refusing to close c=" + c);
     }
 }
