@@ -19,9 +19,12 @@ public class UserDB {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getFirstName());
             ps.setString(3, user.getLastName());
-            return ps.executeUpdate();
+            int retvalue = ps.executeUpdate();
+            System.out.format("Hey! query='%s' returned %d\n", query, retvalue);
+            return retvalue;
         } catch (SQLException e) {
             System.out.println(e);
+            e.printStackTrace();
             return 0;
         } finally {
             DBUtil.closePreparedStatement(ps);

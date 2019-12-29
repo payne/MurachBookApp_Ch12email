@@ -1,5 +1,7 @@
 package murach.data;
 
+import com.mysql.cj.jdbc.MysqlDataSource;
+
 import java.sql.*;
 import javax.sql.DataSource;
 import javax.naming.InitialContext;
@@ -8,8 +10,21 @@ import javax.naming.NamingException;
 public class ConnectionPool {
 
     private static ConnectionPool pool = null;
-    private static DataSource dataSource = null;
+    private static Connection c = null;
+    private String dbUrl, userName, pw;
 
+    private ConnectionPool() {
+this.dbUrl=                "jdbc:mysql://localhost:3306/murach";
+this.userName=                "root";
+this.pw=                "BeNice";
+        try {
+            this.c = DriverManager.getConnection(dbUrl, userName, pw);
+        } catch (SQLException e) {
+            c=null;
+            e.printStackTrace();
+        }
+    }
+/*
     private ConnectionPool() {
         try {
             InitialContext ic = new InitialContext();
@@ -18,6 +33,7 @@ public class ConnectionPool {
             System.out.println(e);
         }
     }
+ */
 
     public static synchronized ConnectionPool getInstance() {
         if (pool == null) {
@@ -27,19 +43,12 @@ public class ConnectionPool {
     }
 
     public Connection getConnection() {
-        try {
-            return dataSource.getConnection();
-        } catch (SQLException e) {
-            System.out.println(e);
-            return null;
-        }
+        //TODO: When connection goes bad -- how to reopen?
+            System.out.println("returning c="+c);
+            return c;
     }
 
     public void freeConnection(Connection c) {
-        try {
-            c.close();
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
+        System.out.println("refusing to close c="+c);
     }
 }
